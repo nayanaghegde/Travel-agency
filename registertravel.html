@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up & Login</title>
+    <link rel="stylesheet" href="registertravelstyle.css">
+</head>
+<body>
+    <div class="container">
+        <h2 id="form-title">Sign Up</h2>
+        <div id="message" class="message"></div>
+        <input type="text" id="username" class="input-field" placeholder="Username" required>
+        <input type="email" id="email" class="input-field" placeholder="Email" required>
+        <input type="password" id="password" class="input-field" placeholder="Password" required>
+        <button id="submit-btn" class="button">Sign Up</button>
+        <p class="toggle" onclick="toggleForm()">Already have an account? Login here</p>
+    </div>
+
+    <script>
+        let users = JSON.parse(localStorage.getItem("users")) || {};
+        let isSignup = true;
+
+        document.getElementById("submit-btn").addEventListener("click", function() {
+            let username = document.getElementById("username").value;
+            let email = document.getElementById("email").value;
+            let password = document.getElementById("password").value;
+            let messageDiv = document.getElementById("message");
+
+            if (password.length <=7) {
+            messageDiv.textContent = "Password must be at least 8 characters long.";
+            return;
+            }
+
+            if (isSignup) {
+                if (users[email]) {
+                    messageDiv.textContent = "Sign-up failed: Account already exists. Please log in.";
+                } else {
+                    users[email] = { username, password };
+                    localStorage.setItem("users", JSON.stringify(users));
+                    messageDiv.textContent = "Sign-up successful! Please log in.";
+                    setTimeout(toggleForm, 1500);
+                }
+            } else {
+                if (users[email] && users[email].password === password) {
+                    localStorage.setItem("loggedInUser", users[email].username);
+                    window.location.href = "travel.html";
+                } else {
+                    messageDiv.textContent = "Login failed: Incorrect email or password.";
+                }
+            }
+        });
+
+        function toggleForm() {
+            isSignup = !isSignup;
+            document.getElementById("form-title").textContent = isSignup ? "Sign Up" : "Login";
+            document.getElementById("submit-btn").textContent = isSignup ? "Sign Up" : "Login";
+            document.querySelector(".toggle").textContent = isSignup ? "Already have an account? Login here" : "Don't have an account? Sign up here";
+            document.getElementById("message").textContent = "";
+            document.getElementById("username").style.display = isSignup ? "block" : "none";
+        }
+    </script>
+</body>
+</html>
